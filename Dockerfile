@@ -10,10 +10,6 @@ WORKDIR /app
 
 # Copy package.json and lock files for dependency installation
 COPY package.json pnpm-lock.yaml ./
-
-# Remove the pnpm-lock.yaml file before installation
-RUN rm pnpm-lock.yaml
-
 RUN corepack enable pnpm && pnpm install --strict-peer-dependencies=false
 
 
