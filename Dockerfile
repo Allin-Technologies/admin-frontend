@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Copy package.json and lock files for dependency installation
 COPY package.json pnpm-lock.yaml ./
-RUN corepack enable pnpm && pnpm install --force
+RUN corepack enable pnpm && pnpm install 
 
 
 # Build stage: Compile the source code (Only rebuild when the source code changes)
@@ -31,7 +31,7 @@ ARG AUTH_SECRET
 ENV AUTH_SECRET=$AUTH_SECRET
 
 # Enable pnpm and run build with legacy-peer-deps
-RUN corepack enable pnpm && pnpm run build --force
+RUN corepack enable pnpm && pnpm run build 
 
 # Production stage: Set up the production image with minimal size
 FROM node:20-alpine AS runner
