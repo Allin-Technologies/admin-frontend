@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
-    "devsafe": "rm -r .next && next dev --turbo",
+    "dev": "next dev --turbo -p 3500",
+    "devsafe": "rm -r .next && next dev --turbo -p 3500",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3500",
     "lint": "next lint"
   },
   "dependencies": {
