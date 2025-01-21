@@ -10,6 +10,10 @@ WORKDIR /app
 
 # Copy package.json and lock files for dependency installation
 COPY package.json pnpm-lock.yaml ./
+
+# Remove the pnpm-lock.yaml file before installation
+RUN rm pnpm-lock.yaml
+
 RUN corepack enable pnpm && pnpm install --strict-peer-dependencies=false
 
 
@@ -28,6 +32,7 @@ ARG API_BASE_URL
 ARG AUTH_SECRET
 
 # Set environment variables for the build stage
+ENV API_BASE_URL=$API_BASE_URL
 ENV AUTH_SECRET=$AUTH_SECRET
 
 # Enable pnpm and run build with legacy-peer-deps
