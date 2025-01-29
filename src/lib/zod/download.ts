@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const _TransactionSchema = z.object({
-  buyerName: z.string().optional(),
+  holderName: z.string().optional(),
   email: z.string().email(),
   gender: z.string(),
   phone_number: z.number(),

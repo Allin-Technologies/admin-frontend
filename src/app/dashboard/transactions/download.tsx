@@ -3,64 +3,65 @@ import { Button } from "@/components/ui/button";
 import { Download as D } from "lucide-react";
 import { z } from "zod";
 import { _TransactionSchema } from "@/lib/zod/download";
-import useCsvDownload from "@/hooks/use-download-csv";
+import { csvDownload } from "@/hooks/use-download-csv";
 import { getTransactionDownload } from "@/actions/transactions";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 
 export function Download() {
-  const [pending, setPending] = React.useState(false);
-  const [data, setData] = React.useState<{
-    transactions: z.infer<typeof _TransactionSchema>[];
-    eventTitle: string;
-  }>({ transactions: [], eventTitle: "" });
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const result = await getTransactionDownload();
 
-  const { downloadCsv } = useCsvDownload<z.infer<typeof _TransactionSchema>>({
-    data: data.transactions,
-    filename: data.eventTitle,
-    headers: [
-      "uniqueID",
-      "buyerName",
-      "email",
-      "phone_number",
-      "gender",
-      "ticket_type",
-      "amount",
-      "date",
-      "trxRef",
-      "payment_status",
-      "check_in",
-    ],
-    onSuccess: () => toast.success("CSV download successful!"),
+      if (!result?.status) {
+        throw new Error(result?.message || "Failed to fetch the CSV content");
+      }
+      return result.data;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSuccess: (data: any | null) => {
+      if (!data) {
+        toast("An error occurred while downloading the file");
+        return;
+      }
+
+      const { downloadCsv } = csvDownload<z.infer<typeof _TransactionSchema>>({
+        data: data.transactions,
+        filename: data.eventTitle,
+        headers: [
+          "uniqueID",
+          "holderName",
+          "email",
+          "phone_number",
+          "gender",
+          "ticket_type",
+          "amount",
+          "date",
+          "trxRef",
+          "payment_status",
+          "check_in",
+        ],
+        onSuccess: () => toast.success("CSV download successful!"),
+      });
+
+      downloadCsv();
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      console.error(error);
+      toast(error.message ?? "An error occurred while downloading the file");
+      return;
+    },
   });
 
   return (
-    <Button
-    className="bg-primary text-white"
-      onClick={async function () {
-        try {
-          setPending(true);
-          const res = await getTransactionDownload();
-
-          if (res?.data?.eventTitle && res.data.transactions) {
-            setData(res?.data);
-            downloadCsv();
-          } else {
-            toast.error(res?.message ?? "Error downloading transactions");
-          }
-        } catch (error) {
-          console.error(error);
-          toast.error("Error downloading transactions");
-        } finally {
-          setPending(false);
-        }
-      }}
-    >
-      {!pending && (
+    <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+      {!mutation.isPending && (
         <>
           <span>Download csv</span> <D />
         </>
       )}
-      {pending && (
+      {mutation.isPending && (
         <>
           <span>Fetching data...</span>{" "}
           <div role='status'>

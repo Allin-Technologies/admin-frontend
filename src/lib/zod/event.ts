@@ -36,7 +36,7 @@ const TicketSaleSchema = z.object({
 });
 
 export const TransactionSchema = z.object({
-  buyerName: z.string(),
+  holderName: z.string().optional(),
   email: z.string().email(),
   gender: z.string(),
   phone_number: z.number(),

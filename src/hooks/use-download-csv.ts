@@ -1,3 +1,5 @@
+import { saveAs } from "file-saver";
+
 type CsvOptions<T extends object> = {
   data: T[]; // Array of data objects to export
   filename?: string; // Optional filename for the CSV file
@@ -6,7 +8,7 @@ type CsvOptions<T extends object> = {
   onError?: (error: Error) => void; // Callback on download error
 };
 
-function useCsvDownload<T extends object>({
+export function csvDownload<T extends object>({
   data,
   filename = "data.csv",
   headers,
@@ -15,7 +17,10 @@ function useCsvDownload<T extends object>({
 }: CsvOptions<T>) {
   // Convert data array to CSV string
   const convertToCsv = (): string => {
-    if (!data.length) return ""; // Check if data array is empty
+    if (!data.length) {
+      console.log("no data");
+      return "";
+    } // Check if data array is empty
 
     // Use headers if provided, otherwise infer from first data object
     const csvHeaders = headers || (Object.keys(data[0] as T) as (keyof T)[]);
@@ -35,27 +40,35 @@ function useCsvDownload<T extends object>({
 
   // Function to trigger CSV download
   const downloadCsv = () => {
-    if (!data.length) return;
+    if (!data.length) {
+      console.log("no data");
+      return;
+    }
 
     try {
       const csvContent = convertToCsv();
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
 
-      // Force download attribute for better browser compatibility
-      link.download = filename;
-      link.href = url;
+      // Check for iOS Safari fallback
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
 
-      // For Firefox compatibility
-      document.body.appendChild(link);
+      if (isIOS) {
+        // Use FileSaver for iOS
+        saveAs(blob, filename);
+      } else {
+        // Standard download method for other browsers
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
 
-      // Trigger click synchronously
-      link.click();
-
-      // Clean up
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+        // Clean up
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
 
       if (onSuccess) onSuccess();
     } catch (error) {
@@ -67,5 +80,3 @@ function useCsvDownload<T extends object>({
 
   return { downloadCsv };
 }
-
-export default useCsvDownload;
