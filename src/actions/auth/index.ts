@@ -12,6 +12,8 @@ export async function getOtp(email: string) {
       data: { email },
     });
 
+    console.log(response);
+
     return response;
   } catch (error) {
     console.error("Error requesting login otp", error);

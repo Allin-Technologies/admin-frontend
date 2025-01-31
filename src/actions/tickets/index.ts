@@ -76,5 +76,8 @@ export async function getTicketsSearch(search: string) {
     method: "get",
   });
 
-  return res;
+  const results =
+    res?.data?.results?.filter((r) => r.payment_status !== "pending") ?? [];
+
+  return { ...res, data: { count: results?.length, results } };
 }

@@ -1,5 +1,5 @@
 import { z } from "zod";
-const EventSchema = z.object({
+export const EventSchema = z.object({
   imgsrc: z.string(),
   title: z.string(),
   description: z.string().optional(),
@@ -37,6 +37,7 @@ const TicketSaleSchema = z.object({
 
 export const TransactionSchema = z.object({
   holderName: z.string().optional(),
+  buyerName: z.string().optional(),
   email: z.string().email(),
   gender: z.string(),
   phone_number: z.number(),

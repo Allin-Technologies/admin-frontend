@@ -15,7 +15,7 @@ export const columns: ColumnDef<Payment>[] = [
     header: "Status",
   },
   {
-    accessorKey: "holderName",
+    accessorKey: "buyerName",
     header: "Name",
   },
   {

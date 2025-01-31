@@ -48,6 +48,10 @@ const data = {
           title: "Overview",
           url: "/dashboard",
         },
+        {
+          title: "Coupons",
+          url: "/dashboard/coupons",
+        },
       ],
       restricted: ["admin"],
     },

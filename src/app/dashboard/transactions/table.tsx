@@ -85,7 +85,7 @@ const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    accessorKey: "holderName",
+    accessorKey: "buyerName",
     header: "Name",
   },
   {
